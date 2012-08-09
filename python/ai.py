@@ -40,32 +40,32 @@ class Mind(object):
     return new_thought
 
   def decay(self):
+    """Reduce activation over time"""
     for thought in self.thoughts:
-      thought.activity -= 1.0
+      r = random.gauss(1.0, 0.25)
+      thought.activity -= r
       logger.info("decay %s=%f", thought.name, sigmoid(thought.activity))
 
   def activate_neighbors(self):
-    pass
+    """Randomly activate neighbors"""
+    for thought in self.thoughts:
+      r = random.gauss(1.0, 0.25)
+      level = r * sigmoid(thought.activity)
+      for neighbor in thought.edges:
+        strength = random.gauss(1.0, 0.25) * r
+        thought.associate(neighbor, strength)
 
   def associate(self):
+    """Make new thoughts associating active thoughts"""
     pass
 
   def chaos(self):
     """Randomly activate thoughts"""
-    max_chance = -10.0
-    max_thought = None
     for thought in self.thoughts:
       r = random.gauss(1.0, 0.25)
-      chance = sigmoid(thought.activity) * r
-      if chance > max_chance:
-        max_chance = chance
-        max_thought = thought
-    if max_thought is not None:
-      max_thought.activity += 1.0
-      logger.info("chaos: %s=%f", max_thought.name,
-                  sigmoid(max_thought.activity))
-    else:
-      logger.info("chaos: nothing activated")
+      thought.activity += r
+      logger.info("chaos: %s=%f", thought.name,
+                  sigmoid(thought.activity))
 
   def think(self):
     """The main loop"""
